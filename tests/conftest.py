@@ -18,10 +18,10 @@ async def test_database() -> AsyncIterator[None]:
 
     yield
 
-    # await conn.execute("DROP DATABASE test;")
+    await conn.execute("DROP DATABASE test;")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 async def test_connection(test_database: None) -> AsyncIterator[Connection]:
     conn = await connect("postgresql://postgres:password@0.0.0.0:5432/test")
     yield conn
@@ -29,19 +29,28 @@ async def test_connection(test_database: None) -> AsyncIterator[Connection]:
 
 
 @pytest.fixture(scope="session")
-async def test_tables(test_connection: Connection) -> None:
-    await init_db(test_connection)
+async def test_tables(test_database: None) -> None:
+    conn = await connect("postgresql://postgres:password@0.0.0.0:5432/test")
+    await init_db(conn)
+    await conn.close()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 async def test_client(test_tables: None) -> AsyncIterator[AsyncClient]:
     app = create_app()
-    app.dependency_overrides[get_config] = lambda: Config(DB_DSN="postgresql://postgres:password@0.0.0.0:5432/test")
 
-    async with AsyncClient(base_url="http://app", transport=ASGITransport(app=app)) as client:
+    def get_test_config() -> Config:
+        return Config(DB_DSN="postgresql://postgres:password@0.0.0.0:5432/test")
+
+    app.dependency_overrides[get_config] = get_test_config
+
+    async with AsyncClient(
+        base_url="http://app", transport=ASGITransport(app)
+    ) as client:
         yield client
 
 
+@pytest.fixture(scope="session")
 def clean_db_urls(test_tables: None) -> list[str]:
     return [
         "postgresql://postgres:password@0.0.0.0:5432/test",

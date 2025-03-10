@@ -1,7 +1,7 @@
 import contextlib
 from collections.abc import AsyncIterator
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from app.api import router
 from app.db import init_db
 from app.config import get_config
