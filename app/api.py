@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from app.models import TodoList, CreateTodoList, EditTodoList
 from app.deps import get_db_connection
-from asyncpg import Connection
+from mysql.connector.aio import MySQLConnectionAbstract as Connection
 from app import crud
 
 router = APIRouter(prefix="/api/v1")

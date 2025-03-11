@@ -5,17 +5,17 @@ from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
 from app.api import router
-from app.db import init_db
+from app.db import init_db, mysql_dsn_to_args
 from app.config import get_config
-from asyncpg import connect
+from mysql.connector.aio import connect
 
 
 @contextlib.asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     config = get_config()
-    conn = await connect(config.DB_DSN)
-    await init_db(conn)
-    await conn.close()
+    async with await connect(**mysql_dsn_to_args(config.DB_DSN)) as conn:
+        await init_db(conn)
+
     yield
 
 

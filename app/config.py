@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class Config(BaseModel):
-    DB_DSN: str = "postgresql://postgres:password@0.0.0.0:5432/postgres"
+    DB_DSN: str = "mysql://root:password@0.0.0.0:3306/mysql"
 
 
 def get_config() -> Config:

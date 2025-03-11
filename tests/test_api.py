@@ -1,4 +1,4 @@
-from asyncpg import Connection
+from mysql.connector.aio import MySQLConnection as Connection
 from httpx import AsyncClient
 from app import crud
 
