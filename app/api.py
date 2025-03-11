@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends
 
 from app.models import TodoList, CreateTodoList, EditTodoList
@@ -9,7 +10,7 @@ router = APIRouter(prefix="/api/v1")
 
 
 @router.get("/todos")
-async def list_todos(conn: Connection = Depends(get_db_connection)) -> list[TodoList]:
+async def list_todos(conn: Connection = Depends(get_db_connection)) -> List[TodoList]:
     return await crud.list_todos(conn)
 
 
